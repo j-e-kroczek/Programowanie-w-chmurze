@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const socket = io('http://localhost:3000'); // Adjust this URL to your server's
+
+            // Listen for messages from the server
+            socket.on('pong', function(data) {
+                console.log('Message from server:', data);
+            });
+
+            // Example of sending a message to the server
+            function sendMessage() {
+                const message = 'HELLO WORLD!';
+                console.log('Sending message:', message);
+                socket.emit('check-lobby', message);
+            }
+
+            // Trigger sendMessage for demonstration purposes
+            setTimeout(sendMessage, 1000);
+        });
+    </script>
+</head>
+<body>
+    <h1>WebSocket Client Example</h1>
+    <p>Check the console for messages.</p>
+</body>
+</html>
