@@ -10,7 +10,6 @@ import {
 
 import { GameService } from './game.service';
 import { Game } from './interfaces/game.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { Server } from 'socket.io';
 
 @WebSocketGateway({
@@ -40,6 +39,8 @@ export class GameGateway
 
   handleDisconnect(client: any) {
     this.logger.log(`Cliend id:${client.id} disconnected`);
+    this.gameService.removePlayerFromAllGames(client.id);
+    this.gameService.removeEmptyGames();
   }
 
   @SubscribeMessage('check-lobby')
@@ -67,16 +68,9 @@ export class GameGateway
       );
       return;
     }
-    const game: Game = {
-      id: uuidv4(),
-      name: 'Game',
-      player1: client.id,
-      player2: null,
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.gameService.create(game);
+    const game: Game = this.gameService.createGame('Tic Tac Toe');
+    this.logger.log(`Game created: ${game.id}`);
+    this.gameService.addPlayerToGame(game.id, client.id);
     client.emit('game-created', game);
     client.broadcast.emit('game-created', game);
   }
@@ -84,6 +78,11 @@ export class GameGateway
   @SubscribeMessage('join-game')
   handleJoinGame(client: any, gameId: string) {
     this.logger.log(`Message received from client id: ${client.id}`);
+    if (this.gameService.findOne(gameId) === undefined) {
+      this.logger.log(`Game id: ${gameId} does not exist`);
+      client.emit('game-not-available');
+      return;
+    }
     if (this.gameService.isPlayerInGame(gameId, client.id)) {
       this.logger.log(`Client id: ${client.id} already in game`);
       client.emit('game-joined', this.gameService.getGameByPlayerId(client.id));
@@ -97,5 +96,17 @@ export class GameGateway
       return;
     }
     client.emit('game-not-available');
+  }
+
+  @SubscribeMessage('start-game')
+  handleStartGame(client: any, gameId: string) {
+    this.logger.log(`Message received from client id: ${client.id}`);
+    const game = this.gameService.findOne(gameId);
+    if (this.gameService.isPlayerGameAdmin(gameId, client.id)) {
+      this.gameService.startGame(game);
+      client.emit('game-started', game);
+      client.broadcast.emit('game-started', game);
+    }
+    return;
   }
 }

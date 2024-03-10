@@ -1,20 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from './interfaces/game.interface';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class GameService {
   private readonly games: Game[] = [];
 
-  create(game: Game): void {
-    this.games.push(game);
-  }
-
   findAll(): Game[] {
     return this.games;
-  }
-
-  findOne(id: string): Game {
-    return this.games.find((game) => game.id === id);
   }
 
   update(id: string, game: Game): void {
@@ -25,6 +18,32 @@ export class GameService {
   remove(id: string): void {
     const index = this.games.findIndex((game) => game.id === id);
     this.games.splice(index, 1);
+  }
+
+  findOne(id: string): Game {
+    return this.games.find((game) => game.id === id);
+  }
+
+  createGame(name: string): Game {
+    const game: Game = {
+      id: uuidv4(),
+      name,
+      player1: null,
+      player2: null,
+      board: {
+        board: [
+          { row: [{ value: null }, { value: null }, { value: null }] },
+          { row: [{ value: null }, { value: null }, { value: null }] },
+          { row: [{ value: null }, { value: null }, { value: null }] },
+        ],
+      },
+      currentPlayer: null,
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.games.push(game);
+    return game;
   }
 
   checkAvailableGames(): Game[] {
@@ -57,5 +76,85 @@ export class GameService {
       game.player2 = playerId;
     }
     this.update(gameId, game);
+  }
+
+  removePlayerFromAllGames(playerId: string): void {
+    this.games.forEach((game) => {
+      if (game.player1 === playerId) {
+        game.player1 = null;
+      }
+      if (game.player2 === playerId) {
+        game.player2 = null;
+      }
+      this.update(game.id, game);
+    });
+  }
+
+  removeEmptyGames(): void {
+    this.games.forEach((game) => {
+      if (game.player1 === null && game.player2 === null) {
+        this.remove(game.id);
+      }
+    });
+  }
+
+  isPlayerTurn(game: Game, playerId: string): boolean {
+    return game.currentPlayer === playerId;
+  }
+
+  isGameDraw(game: Game): boolean {
+    return game.board.board.every((row) =>
+      row.row.every((cell) => cell.value !== null),
+    );
+  }
+
+  isPlayerGameAdmin(gameId: string, playerId: string): boolean {
+    const game = this.findOne(gameId);
+    return game.player1 === playerId;
+  }
+
+  startGame(game: Game): void {
+    game.currentPlayer = game.player1;
+    game.status = 'in-progress';
+    this.update(game.id, game);
+  }
+
+  isGameFinished(game: Game): boolean {
+    return game.status === 'winner' || game.status === 'draw';
+  }
+
+  makeMove(game: Game, row: number, column: number, playerId: string): boolean {
+    if (!this.isPlayerTurn(game, playerId)) {
+      return false;
+    }
+    if (game.board.board[row].row[column].value !== null) {
+      return false;
+    }
+    game.board.board[row].row[column].value =
+      playerId === game.player1 ? 'P1' : 'P2';
+    game.currentPlayer =
+      playerId === game.player1 ? game.player2 : game.player1;
+    game.updatedAt = new Date();
+    this.update(game.id, game);
+    return true;
+  }
+
+  isGameWinner(game: Game): boolean {
+    const board = game.board.board;
+    console.log(board);
+    return false;
+  }
+
+  checkGameStatus(game: Game): void {
+    if (this.isGameDraw(game)) {
+      game.status = 'draw';
+      this.update(game.id, game);
+      return;
+    }
+    if (this.isGameWinner(game)) {
+      game.status = 'winner';
+      this.update(game.id, game);
+      return;
+    }
   }
 }

@@ -24,6 +24,11 @@
                 // Update the UI here to show the created game
             });
 
+            socket.on('game-joined', (game) => {
+                console.log('Game joined:', game);
+                // Update the UI here to show the joined game
+            });
+
             // Function to check available games
             function checkLobby() {
                 console.log('Checking available games');
@@ -36,9 +41,18 @@
                 socket.emit('create-game');
             }
 
+            function joinGame(gameId) {
+                console.log('Joining game:', gameId);
+                socket.emit('join-game', gameId);
+            }
+
             // Example buttons to interact with the WebSocket
             document.getElementById('checkLobbyBtn').addEventListener('click', checkLobby);
             document.getElementById('createGameBtn').addEventListener('click', createGame);
+            document.getElementById('joinGameBtn').addEventListener('click', () => {
+                const gameId = document.getElementById('gameId').value;
+                joinGame(gameId);
+            });
         });
     </script>
 </head>
@@ -46,6 +60,8 @@
     <h1>WebSocket Game Test</h1>
     <button id="checkLobbyBtn">Check Lobby</button>
     <button id="createGameBtn">Create Game</button>
+    <input id="gameId" type="text" placeholder="Game ID">
+    <button id="joinGameBtn">Join Game</button>
     <!-- You can add elements here to display available games and game creation status -->
 </body>
 </html>

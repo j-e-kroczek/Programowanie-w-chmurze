@@ -1,4 +1,11 @@
-import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsNotEmpty,
+  IsObject,
+  IsString,
+} from 'class-validator';
+import { TicTacToeBoard } from './board.interface';
 
 export class Game {
   @IsNotEmpty()
@@ -15,8 +22,14 @@ export class Game {
   @IsString()
   player2: string;
 
+  @IsObject()
+  board: TicTacToeBoard;
+
+  @IsString()
+  currentPlayer: string;
+
   @IsNotEmpty()
-  @IsEnum(['pending', 'in-progress', 'completed'])
+  @IsEnum(['pending', 'in-progress', 'winner', 'draw'])
   status: string;
 
   @IsDate()
