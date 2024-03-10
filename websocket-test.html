@@ -2,32 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Test</title>
+    <title>WebSocket Game Test</title>
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const socket = io('http://localhost:3000'); // Adjust this URL to your server's
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io('http://localhost:3000'); // Adjust the port if needed
 
-            // Listen for messages from the server
-            socket.on('pong', function(data) {
-                console.log('Message from server:', data);
+            socket.on('connect', () => {
+                console.log('Connected to the WebSocket server');
             });
 
-            // Example of sending a message to the server
-            function sendMessage() {
-                const message = 'HELLO WORLD!';
-                console.log('Sending message:', message);
-                socket.emit('check-lobby', message);
+            // Listening for available games from the server
+            socket.on('available-games', (games) => {
+                console.log('Available games:', games);
+                // Update the UI here to show available games
+            });
+
+            // Listening for game creation confirmation
+            socket.on('game-created', (game) => {
+                console.log('Game created:', game);
+                // Update the UI here to show the created game
+            });
+
+            // Function to check available games
+            function checkLobby() {
+                console.log('Checking available games');
+                socket.emit('check-lobby');
             }
 
-            // Trigger sendMessage for demonstration purposes
-            setTimeout(sendMessage, 1000);
+            // Function to create a new game
+            function createGame() {
+                console.log('Creating a new game');
+                socket.emit('create-game');
+            }
+
+            // Example buttons to interact with the WebSocket
+            document.getElementById('checkLobbyBtn').addEventListener('click', checkLobby);
+            document.getElementById('createGameBtn').addEventListener('click', createGame);
         });
     </script>
 </head>
 <body>
-    <h1>WebSocket Client Example</h1>
-    <p>Check the console for messages.</p>
+    <h1>WebSocket Game Test</h1>
+    <button id="checkLobbyBtn">Check Lobby</button>
+    <button id="createGameBtn">Create Game</button>
+    <!-- You can add elements here to display available games and game creation status -->
 </body>
 </html>
