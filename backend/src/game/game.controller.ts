@@ -67,7 +67,9 @@ export class GameController {
     if (game.currentPlayer !== body.playerId) {
       throw new HttpException('Not your turn', 400);
     }
-    this.gameService.makeMove(game, body.row, body.column, body.playerId);
-    return this.gameService.findOne(id);
+    if (this.gameService.makeMove(game, body.row, body.column, body.playerId)) {
+      return this.gameService.findOne(id);
+    }
+    throw new HttpException('Invalid move', 400);
   }
 }
