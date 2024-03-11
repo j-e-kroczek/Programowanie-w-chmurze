@@ -4,6 +4,7 @@ import { Metadata } from "next"
 import { ModeToggle } from "@/components/ui/theme-toggle"
 import { GameTable } from "./game-table"
 import axios from "axios"
+import { Game } from "./types/game"
 
 export const metadata: Metadata = {
   title: "Game list",
@@ -22,7 +23,7 @@ async function getGamesData() {
 
 
 export default async function GameListPage() {
-  const games = await getGamesData()
+  const games: Game[] = await getGamesData()
   console.log(games)
   return (
     <>
@@ -35,7 +36,7 @@ export default async function GameListPage() {
         <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
       </div>
       <div className="flex flex-row m-3">
-        <GameTable></GameTable>
+        <GameTable games={games}></GameTable>
       </div>
     </>
   )
