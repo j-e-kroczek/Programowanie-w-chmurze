@@ -2,7 +2,7 @@ import exp from "constants";
 
 type Cell = 'P1' | 'P2' | null;
 
-export type TicTacToeCell = Cell;
+export type TicTacToeCell = {value: Cell};
 
 interface Row {
   row: [TicTacToeCell, TicTacToeCell, TicTacToeCell];

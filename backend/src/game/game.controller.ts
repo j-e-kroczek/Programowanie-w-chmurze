@@ -37,6 +37,9 @@ export class GameController {
     }
     if (this.gameService.isGameAvailable(game.id)) {
       const playerId = this.gameService.addPlayerToGame(game.id, body.userName);
+      if (this.gameService.isGameReady(game)) {
+        this.gameService.startGame(game);
+      }
       return { id: game.id, playerid: playerId };
     }
     throw new HttpException('Game not available', 400);
@@ -45,6 +48,26 @@ export class GameController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   getGame(@Param('id') id: string) {
+    return this.gameService.findOne(id);
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post(':id/move')
+  makeMove(
+    @Param('id') id: string,
+    @Body() body: { playerId: string; row: number; column: number },
+  ) {
+    const game = this.gameService.findOne(id);
+    if (!game) {
+      throw new HttpException('Game not found', 404);
+    }
+    if (game.status !== 'in-progress') {
+      throw new HttpException('Game not in progress', 400);
+    }
+    if (game.currentPlayer !== body.playerId) {
+      throw new HttpException('Not your turn', 400);
+    }
+    this.gameService.makeMove(game, body.row, body.column, body.playerId);
     return this.gameService.findOne(id);
   }
 }

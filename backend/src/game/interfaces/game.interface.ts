@@ -34,6 +34,7 @@ export class Game {
   @IsObject()
   board: TicTacToeBoard;
 
+  @Exclude()
   @IsString()
   currentPlayer: string;
 

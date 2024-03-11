@@ -1,18 +1,28 @@
-import { TicTacToeBoard } from "@/app/types/game";
+import { TicTacToeBoard, TicTacToeCell } from "@/app/types/game";
 import "./board.css";
 
-export default function Board({ board }: { board: TicTacToeBoard }) {
+export default function Board({ board, makeMove }: { board: TicTacToeBoard, makeMove: (row: number, column: number) => void}) {
+  const getClassName = (cell: TicTacToeCell) => {
+    switch (cell.value) {
+      case 'P1': return 'cell cross';
+      case 'P2': return 'cell circle';
+      default: return 'cell';
+    }
+  };
+
   return (
+    console.log(board.board[0].row[0]?.value),
     <div className="game">
-      <div className="cell cross" id="0"></div>
-      <div className="cell" id="1"></div>
-      <div className="cell" id="2"></div>
-      <div className="cell" id="3"></div>
-      <div className="cell circle" id="4"></div>
-      <div className="cell" id="5"></div>
-      <div className="cell" id="6"></div>
-      <div className="cell" id="7"></div>
-      <div className="cell" id="8"></div>
+      {board.board.map((row, rowIndex) =>
+        row.row.map((cell, cellIndex) => (
+          <div
+            key={`${rowIndex}-${cellIndex}`}
+            className={getClassName(cell)}
+            id={`${rowIndex * board.board.length + cellIndex}`}
+            onClick={() => makeMove(rowIndex, cellIndex)}
+          ></div>
+        ))
+      )}
     </div>
   );
 }

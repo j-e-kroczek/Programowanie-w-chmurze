@@ -115,6 +115,10 @@ export class GameService {
     );
   }
 
+  isGameReady(game: Game): boolean {
+    return game.player1 !== null && game.player2 !== null;
+  }
+
   isPlayerGameAdmin(gameId: string, playerId: string): boolean {
     const game = this.findOne(gameId);
     return game.player1 === playerId;
