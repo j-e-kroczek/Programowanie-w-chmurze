@@ -2,6 +2,7 @@ import { promises as fs } from "fs"
 import path from "path"
 import { Metadata } from "next"
 import { ModeToggle } from "@/components/ui/theme-toggle"
+import { GameTable } from "./game-table"
 
 export const metadata: Metadata = {
   title: "Game list",
@@ -20,6 +21,9 @@ export default async function GameListPage() {
               Here are list of available games
             </p></div>
         <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
+      </div>
+      <div className="flex flex-row m-3">
+        <GameTable></GameTable>
       </div>
     </>
   )
