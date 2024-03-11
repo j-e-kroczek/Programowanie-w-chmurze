@@ -1,45 +1,25 @@
 import { promises as fs } from "fs"
 import path from "path"
 import { Metadata } from "next"
-import Image from "next/image"
-
 import { ModeToggle } from "@/components/ui/theme-toggle"
 
 export const metadata: Metadata = {
-  title: "Tasks",
-  description: "A task and issue tracker build using Tanstack Table.",
+  title: "Game list",
+  description: "A list of available games to play",
 }
 
 
-export default async function TaskPage() {
+export default async function GameListPage() {
 
   return (
     <>
-      <div className="md:hidden">
-        <Image
-          src="/examples/tasks-light.png"
-          width={1280}
-          height={998}
-          alt="Playground"
-          className="block dark:hidden"
-        />
-        <Image
-          src="/examples/tasks-dark.png"
-          width={1280}
-          height={998}
-          alt="Playground"
-          className="hidden dark:block"
-        />
-      </div>
-      <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
-        <div className="flex items-center justify-between space-y-2">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
+      <div className="flex flex-row mt-3 ml-3">
+        <div className="basis-3/4">
+          <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
             <p className="text-muted-foreground">
-              Here&apos;s a list of your tasks for this month!
-            </p>
-          </div> 
-        </div>
+              Here are list of available games
+            </p></div>
+        <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
       </div>
     </>
   )
