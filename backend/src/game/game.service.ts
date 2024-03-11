@@ -24,12 +24,14 @@ export class GameService {
     return this.games.find((game) => game.id === id);
   }
 
-  createGame(name: string): Game {
-    const game: Game = {
+  createGame(name: string, userName: string): Game {
+    const game: Game = new Game({
       id: uuidv4(),
       name,
-      player1: null,
+      player1: uuidv4(),
+      player1Name: userName,
       player2: null,
+      player2Name: null,
       board: {
         board: [
           { row: [{ value: null }, { value: null }, { value: null }] },
@@ -41,15 +43,16 @@ export class GameService {
       status: 'pending',
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
+    });
     this.games.push(game);
     return game;
   }
 
   checkAvailableGames(): Game[] {
-    return this.games.filter(
+    const games = this.games.filter(
       (game) => game.player1 === null || game.player2 === null,
     );
+    return games;
   }
 
   getGameByPlayerId(playerId: string): Game {
@@ -68,14 +71,18 @@ export class GameService {
     return game.player1 === playerId || game.player2 === playerId;
   }
 
-  addPlayerToGame(gameId: string, playerId: string): void {
+  addPlayerToGame(gameId: string, playerName: string): string {
     const game = this.findOne(gameId);
+    const playerId = uuidv4();
     if (game.player1 === null) {
       game.player1 = playerId;
+      game.player1Name = playerName;
     } else {
       game.player2 = playerId;
+      game.player2Name = playerName;
     }
     this.update(gameId, game);
+    return playerId;
   }
 
   removePlayerFromAllGames(playerId: string): void {

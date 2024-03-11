@@ -6,6 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 import { TicTacToeBoard } from './board.interface';
+import { Exclude } from 'class-transformer';
 
 export class Game {
   @IsNotEmpty()
@@ -16,11 +17,19 @@ export class Game {
   @IsString()
   name: string;
 
+  @Exclude()
   @IsString()
   player1: string;
 
   @IsString()
+  player1Name: string;
+
+  @Exclude()
+  @IsString()
   player2: string;
+
+  @IsString()
+  player2Name: string;
 
   @IsObject()
   board: TicTacToeBoard;
@@ -37,4 +46,8 @@ export class Game {
 
   @IsDate()
   updatedAt: Date;
+
+  constructor(partial: Partial<Game>) {
+    Object.assign(this, partial);
+  }
 }

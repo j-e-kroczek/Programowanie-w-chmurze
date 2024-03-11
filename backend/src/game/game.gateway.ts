@@ -9,7 +9,6 @@ import {
 } from '@nestjs/websockets';
 
 import { GameService } from './game.service';
-import { Game } from './interfaces/game.interface';
 import { Server } from 'socket.io';
 
 @WebSocketGateway({
@@ -49,30 +48,6 @@ export class GameGateway
     const availableGames = this.gameService.checkAvailableGames();
     this.logger.log(`Available games: ${availableGames.length}`);
     client.emit('available-games', availableGames);
-  }
-
-  @SubscribeMessage('create-game')
-  handleCreateGame(client: any) {
-    this.logger.log(`Message received from client id: ${client.id}`);
-    if (
-      this.gameService
-        .findAll()
-        .filter(
-          (game) => game.player1 === client.id || game.player2 === client.id,
-        ).length > 0
-    ) {
-      this.logger.log(`Client id: ${client.id} already has a game`);
-      client.emit(
-        'game-created',
-        this.gameService.getGameByPlayerId(client.id),
-      );
-      return;
-    }
-    const game: Game = this.gameService.createGame('Tic Tac Toe');
-    this.logger.log(`Game created: ${game.id}`);
-    this.gameService.addPlayerToGame(game.id, client.id);
-    client.emit('game-created', game);
-    client.broadcast.emit('game-created', game);
   }
 
   @SubscribeMessage('join-game')

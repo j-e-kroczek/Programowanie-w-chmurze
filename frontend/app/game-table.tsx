@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Cookie, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -37,8 +37,28 @@ import {
 } from "@/components/ui/table"
 
 import { Game } from "./types/game"
+import axios from "axios"
+import { useCookies } from "react-cookie"
+import { redirect } from "next/dist/server/api-utils"
+import { navigate } from "./actions"
 
-export const columns: ColumnDef<Game>[] = [
+interface GameTableProps {
+  games: Game[];
+}
+
+export function GameTable({ games: data }: GameTableProps) {
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  )
+  const [cookies, setCookie, removeCookie] = useCookies(['game', 'user']);
+  const [gameName, setGameName] = React.useState<string>("")
+  const [userName, setUserName] = React.useState<string>("")
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState({})
+
+  const columns: ColumnDef<Game>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -54,18 +74,18 @@ export const columns: ColumnDef<Game>[] = [
     ),
   },
   {
-    accessorKey: "player1",
+    accessorKey: "player1Name",
     header: "Player 1",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("player1")}</div>
+      <div className="capitalize">{row.getValue("player1Name")}</div>
     ),
   },
   {
-    accessorKey: "player2",
+    accessorKey: "player2Name",
     header: "Player 2",
     cell: ({ row }) => (
       <div className="capitalize">
-        {row.getValue("player2") === null ? "N/A" : row.getValue("player2")}
+        {row.getValue("player2Name") === null ? "N/A" : row.getValue("player2Name")}
       </div>
     ),
   },
@@ -79,7 +99,19 @@ export const columns: ColumnDef<Game>[] = [
         <Button
           variant="outline"
           size="sm"
-          disabled={game.status !== "pending"}
+          disabled={game.status !== "pending" || userName.length===0}
+          onClick={() => {
+            axios.post("http://localhost:3000/api/game/join/"+game.id, { userName: userName }).then((response) => {
+              console.log(response)
+              navigate(game.id)
+              setCookie('game', game.id, { path: '/' })
+              setCookie('user', response.data.playerid, { path: '/' })
+            }
+            ).catch((error) => {
+              console.error(error)
+            }
+            )
+          }}
         >
           Join game
         </Button>
@@ -87,21 +119,6 @@ export const columns: ColumnDef<Game>[] = [
     },
   }
 ]
-
-interface GameTableProps {
-  games: Game[];
-}
-
-export function GameTable({ games: data }: GameTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-
-  console.log(data)
 
   const table = useReactTable({
     data: data,
@@ -122,12 +139,37 @@ export function GameTable({ games: data }: GameTableProps) {
     },
   })
 
+  const createGame = () => {
+    if (gameName.length > 0) {
+      axios.post("http://localhost:3000/api/game/create", { name: gameName, userName: userName }).then((response) => {
+        console.log(response)
+        setCookie('game', response.data.id, { path: '/' })
+        setCookie('user', response.data.playerid, { path: '/' })
+        navigate(response.data.id)
+      }
+      ).catch((error) => {
+        console.error(error)
+      }
+      )
+    }
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Button variant="outline" className="mr-2">
+        <Button variant="outline" className="mr-2" onClick={createGame} disabled={gameName.length===0||userName.length===0} >
           Create game
         </Button>
+        <Input
+          placeholder="Game name"
+          className="w-64"
+          onChange={(e) => setGameName(e.target.value)}
+          ></Input>
+        <Input
+          placeholder="Username"
+          className="w-64 ml-2"
+          onChange={(e) => setUserName(e.target.value)}
+          ></Input>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
