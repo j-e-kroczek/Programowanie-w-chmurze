@@ -3,15 +3,27 @@ import path from "path"
 import { Metadata } from "next"
 import { ModeToggle } from "@/components/ui/theme-toggle"
 import { GameTable } from "./game-table"
+import axios from "axios"
 
 export const metadata: Metadata = {
   title: "Game list",
   description: "A list of available games to play",
 }
 
+async function getGamesData() {
+  try {
+    const response = await axios.get(process.env.API_ROUTE + '/game');
+    return response.data; 
+  } catch (error) {
+    console.log(error);
+    return null;  
+  }
+}
+
 
 export default async function GameListPage() {
-
+  const games = await getGamesData()
+  console.log(games)
   return (
     <>
       <div className="flex flex-row mt-3 ml-3">
