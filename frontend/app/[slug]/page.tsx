@@ -36,10 +36,11 @@ export default function Page({ params }: { params: { slug: string } }) {
                 },
                 body: JSON.stringify({ row, column, playerId: cookies.user })
             });
-            const data = await response.json();
-            setGameData(data);
+            if (response.ok) {
+                const data = await response.json();
+                setGameData(data);
+            }
         } catch (error) {
-            console.error(error);
         }
     }
 
