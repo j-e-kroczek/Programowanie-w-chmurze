@@ -60,7 +60,7 @@ export default function GameListPage() {
   , [cookies.game, cookies.playerPrivateKey, cookies.playerPublicKey, removeCookie])
 
   const reconnect = () => {
-    navigate("/"+cookies.game)
+    navigate(cookies.game)
   }
 
   const quitGame = async () => {
