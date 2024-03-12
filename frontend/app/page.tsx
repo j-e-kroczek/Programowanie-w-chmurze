@@ -9,10 +9,13 @@ import axios from "axios"
 import { Game } from "./types/game"
 import toast from "react-hot-toast"
 import { use, useEffect, useState } from "react"
+import { useCookies } from "react-cookie"
+import { navigate } from "./actions"
 
 export default function GameListPage() {
 
   const [games, setGames] = useState<Game[]>([])
+  const [cookies, setCookie, removeCookie] = useCookies(['game', 'playerPrivateKey', "playerPublicKey"]);
 
   const getGamesData = async () => {
     const response = await axios.get("http://localhost:3000/api/game")
@@ -21,6 +24,9 @@ export default function GameListPage() {
   }
   
   useEffect(() => {
+    if (cookies.game !== undefined) {
+      navigate(`/${cookies.game}`)
+    }
     getGamesData()
   }
   , [])

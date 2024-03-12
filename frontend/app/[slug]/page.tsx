@@ -51,7 +51,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         catch (error) {
             console.error(error);
             toast.error("Game not found");
-            navigate("/");
+            quitGame();
         }
     }
 
@@ -82,7 +82,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         catch (error) {
             console.error(error);
             toast.error("Game not found");
-            navigate("/");
+            quitGame();
         }
         
     }
@@ -122,20 +122,19 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
 
     const quitGame = async () => {
+        //Todo: remove player from game
         const response = await axios.post(`http://localhost:3000/api/game/${params.slug}/quit`, {
             playerPrivateKey: cookies.playerPrivateKey,
             playerPublicKey: cookies.playerPublicKey
         }).catch((error) => {
-            toast.error(error.response.data.message);
+            
         }
         );
-        if(response){
-            removeCookie("game");
-            removeCookie("playerPrivateKey");
-            removeCookie("playerPublicKey");
-            socket.emit('leaveGame', params.slug);
-            navigate("/");
-        }
+        removeCookie("game");
+        removeCookie("playerPrivateKey");
+        removeCookie("playerPublicKey");
+        socket.emit('leaveGame', params.slug);
+        navigate("/");
     }
 
     useState(() => {
