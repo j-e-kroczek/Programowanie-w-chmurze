@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsDate,
   IsEnum,
   IsNotEmpty,
@@ -22,6 +23,9 @@ export class Game {
   player1: string;
 
   @IsString()
+  player1pub: string;
+
+  @IsString()
   player1Name: string;
 
   @Exclude()
@@ -29,18 +33,23 @@ export class Game {
   player2: string;
 
   @IsString()
+  player2pub: string;
+
+  @IsString()
   player2Name: string;
 
   @IsObject()
   board: TicTacToeBoard;
 
-  @Exclude()
   @IsString()
   currentPlayer: string;
 
   @IsNotEmpty()
   @IsEnum(['pending', 'in-progress', 'winner', 'draw'])
   status: string;
+
+  @IsArray()
+  socketUsers: string[];
 
   @IsDate()
   createdAt: Date;

@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from './interfaces/game.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { randomBytes } from 'crypto';
+
+const generateKey = () => {
+  const key = randomBytes(32);
+  const hexKey = key.toString('hex');
+  return hexKey;
+};
 
 @Injectable()
 export class GameService {
@@ -28,9 +35,11 @@ export class GameService {
     const game: Game = new Game({
       id: uuidv4(),
       name,
-      player1: uuidv4(),
+      player1: generateKey(),
+      player1pub: uuidv4(),
       player1Name: userName,
       player2: null,
+      player2pub: null,
       player2Name: null,
       board: {
         board: [
@@ -41,6 +50,7 @@ export class GameService {
       },
       currentPlayer: null,
       status: 'pending',
+      socketUsers: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -71,18 +81,27 @@ export class GameService {
     return game.player1 === playerId || game.player2 === playerId;
   }
 
-  addPlayerToGame(gameId: string, playerName: string): string {
+  addPlayerToGame(
+    gameId: string,
+    playerName: string,
+  ): { privateKey: string; pubKey: string } {
     const game = this.findOne(gameId);
-    const playerId = uuidv4();
+    const playerPrivateKey = generateKey();
+    const playerPubKey = uuidv4();
     if (game.player1 === null) {
-      game.player1 = playerId;
+      game.player1 = playerPrivateKey;
+      game.player1pub = playerPubKey;
       game.player1Name = playerName;
     } else {
-      game.player2 = playerId;
+      game.player2 = playerPrivateKey;
+      game.player2pub = playerPubKey;
       game.player2Name = playerName;
     }
     this.update(gameId, game);
-    return playerId;
+    return {
+      privateKey: playerPrivateKey,
+      pubKey: playerPubKey,
+    };
   }
 
   removePlayerFromAllGames(playerId: string): void {
@@ -125,7 +144,7 @@ export class GameService {
   }
 
   startGame(game: Game): void {
-    game.currentPlayer = game.player1;
+    game.currentPlayer = game.player1pub;
     game.status = 'in-progress';
     this.update(game.id, game);
   }
@@ -134,17 +153,37 @@ export class GameService {
     return game.status === 'winner' || game.status === 'draw';
   }
 
-  makeMove(game: Game, row: number, column: number, playerId: string): boolean {
-    if (!this.isPlayerTurn(game, playerId)) {
+  authPlayer(gameId: string, playerId: string, playerPubKey: string): boolean {
+    const game = this.findOne(gameId);
+    if (game.player1 === playerId && game.player1pub === playerPubKey) {
+      return true;
+    }
+    if (game.player2 === playerId && game.player2pub === playerPubKey) {
+      return true;
+    }
+    return false;
+  }
+
+  makeMove(
+    game: Game,
+    row: number,
+    column: number,
+    playerPrivKey: string,
+    playerPubKey: string,
+  ): boolean {
+    if (!this.isPlayerTurn(game, playerPubKey)) {
+      return false;
+    }
+    if (this.authPlayer(game.id, playerPrivKey, playerPubKey) === false) {
       return false;
     }
     if (game.board.board[row].row[column].value !== null) {
       return false;
     }
     game.board.board[row].row[column].value =
-      playerId === game.player1 ? 'P1' : 'P2';
+      playerPrivKey === game.player1 ? 'P1' : 'P2';
     game.currentPlayer =
-      playerId === game.player1 ? game.player2 : game.player1;
+      playerPubKey === game.player1pub ? game.player2pub : game.player1pub;
     game.updatedAt = new Date();
     this.update(game.id, game);
     return true;
@@ -167,5 +206,18 @@ export class GameService {
       this.update(game.id, game);
       return;
     }
+  }
+
+  addSocketUser(gameId: string, socketId: string): void {
+    const game = this.findOne(gameId);
+    game.socketUsers.push(socketId);
+    this.update(gameId, game);
+  }
+
+  removeSocketUser(gameId: string, socketId: string): void {
+    const game = this.findOne(gameId);
+    const index = game.socketUsers.indexOf(socketId);
+    game.socketUsers.splice(index, 1);
+    this.update(gameId, game);
   }
 }

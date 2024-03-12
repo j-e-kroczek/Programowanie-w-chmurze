@@ -11,7 +11,6 @@ export default function Board({ board, makeMove }: { board: TicTacToeBoard, make
   };
 
   return (
-    console.log(board.board[0].row[0]?.value),
     <div className="game">
       {board.board.map((row, rowIndex) =>
         row.row.map((cell, cellIndex) => (

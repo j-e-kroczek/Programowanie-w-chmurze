@@ -26,7 +26,11 @@ export class GameController {
       throw new HttpException('Name is required', 400);
     }
     const game = this.gameService.createGame(body.name, body.userName);
-    return { id: game.id, playerid: game.player1 };
+    return {
+      id: game.id,
+      playerPrivateKey: game.player1,
+      playerPublicKey: game.player1pub,
+    };
   }
 
   @Post('join/:id')
@@ -36,11 +40,18 @@ export class GameController {
       throw new HttpException('Game not found', 404);
     }
     if (this.gameService.isGameAvailable(game.id)) {
-      const playerId = this.gameService.addPlayerToGame(game.id, body.userName);
+      const playerData = this.gameService.addPlayerToGame(
+        game.id,
+        body.userName,
+      );
       if (this.gameService.isGameReady(game)) {
         this.gameService.startGame(game);
       }
-      return { id: game.id, playerid: playerId };
+      return {
+        id: game.id,
+        playerPrivateKey: playerData.privateKey,
+        playerPublicKey: playerData.pubKey,
+      };
     }
     throw new HttpException('Game not available', 400);
   }
@@ -55,7 +66,13 @@ export class GameController {
   @Post(':id/move')
   makeMove(
     @Param('id') id: string,
-    @Body() body: { playerId: string; row: number; column: number },
+    @Body()
+    body: {
+      playerPrivateKey: string;
+      playerPublicKey: string;
+      row: number;
+      column: number;
+    },
   ) {
     const game = this.gameService.findOne(id);
     if (!game) {
@@ -64,10 +81,27 @@ export class GameController {
     if (game.status !== 'in-progress') {
       throw new HttpException('Game not in progress', 400);
     }
-    if (game.currentPlayer !== body.playerId) {
+    if (game.currentPlayer !== body.playerPublicKey) {
       throw new HttpException('Not your turn', 400);
     }
-    if (this.gameService.makeMove(game, body.row, body.column, body.playerId)) {
+    if (
+      !this.gameService.authPlayer(
+        game.id,
+        body.playerPrivateKey,
+        body.playerPublicKey,
+      )
+    ) {
+      throw new HttpException('Auth fail', 400);
+    }
+    if (
+      this.gameService.makeMove(
+        game,
+        body.row,
+        body.column,
+        body.playerPrivateKey,
+        body.playerPublicKey,
+      )
+    ) {
       return this.gameService.findOne(id);
     }
     throw new HttpException('Invalid move', 400);

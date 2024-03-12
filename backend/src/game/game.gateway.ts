@@ -38,50 +38,28 @@ export class GameGateway
 
   handleDisconnect(client: any) {
     this.logger.log(`Cliend id:${client.id} disconnected`);
-    this.gameService.removePlayerFromAllGames(client.id);
     this.gameService.removeEmptyGames();
   }
 
-  @SubscribeMessage('check-lobby')
-  handleCheckLobby(client: any) {
-    this.logger.log(`Message received from client id: ${client.id}`);
-    const availableGames = this.gameService.checkAvailableGames();
-    this.logger.log(`Available games: ${availableGames.length}`);
-    client.emit('available-games', availableGames);
+  @SubscribeMessage('joinGame')
+  handleJoinGame(client: any, payload: any) {
+    const game = this.gameService.findOne(payload);
+    if (game) {
+      this.logger.log(`Client id: ${client.id} joined game ${game.id}`);
+      client.join(game.id);
+    } else {
+      client.emit('gameError', 'Game not found');
+    }
   }
 
-  @SubscribeMessage('join-game')
-  handleJoinGame(client: any, gameId: string) {
-    this.logger.log(`Message received from client id: ${client.id}`);
-    if (this.gameService.findOne(gameId) === undefined) {
-      this.logger.log(`Game id: ${gameId} does not exist`);
-      client.emit('game-not-available');
-      return;
+  @SubscribeMessage('updateGame')
+  handleUpdateGame(client: any, payload: any) {
+    const game = this.gameService.findOne(payload);
+    if (game) {
+      this.logger.log(`Client id: ${client.id} updated game ${game.id}`);
+      client.to(game.id).emit('gameUpdated', game.board);
+    } else {
+      client.emit('gameError', 'Game not found');
     }
-    if (this.gameService.isPlayerInGame(gameId, client.id)) {
-      this.logger.log(`Client id: ${client.id} already in game`);
-      client.emit('game-joined', this.gameService.getGameByPlayerId(client.id));
-      return;
-    }
-    if (this.gameService.isGameAvailable(gameId)) {
-      this.gameService.addPlayerToGame(gameId, client.id);
-      const game = this.gameService.findOne(gameId);
-      client.emit('game-joined', game);
-      client.broadcast.emit('game-joined', game);
-      return;
-    }
-    client.emit('game-not-available');
-  }
-
-  @SubscribeMessage('start-game')
-  handleStartGame(client: any, gameId: string) {
-    this.logger.log(`Message received from client id: ${client.id}`);
-    const game = this.gameService.findOne(gameId);
-    if (this.gameService.isPlayerGameAdmin(gameId, client.id)) {
-      this.gameService.startGame(game);
-      client.emit('game-started', game);
-      client.broadcast.emit('game-started', game);
-    }
-    return;
   }
 }

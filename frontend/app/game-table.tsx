@@ -51,7 +51,7 @@ export function GameTable({ games: data }: GameTableProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
-  const [cookies, setCookie, removeCookie] = useCookies(['game', 'user']);
+  const [cookies, setCookie, removeCookie] = useCookies(['game', 'playerPrivateKey', "playerPublicKey"]);
   const [gameName, setGameName] = React.useState<string>("")
   const [userName, setUserName] = React.useState<string>("")
   const [columnVisibility, setColumnVisibility] =
@@ -102,10 +102,10 @@ export function GameTable({ games: data }: GameTableProps) {
           disabled={game.status !== "pending" || userName.length===0}
           onClick={() => {
             axios.post("http://localhost:3000/api/game/join/"+game.id, { userName: userName }).then((response) => {
-              console.log(response)
               navigate(game.id)
               setCookie('game', game.id, { path: '/' })
-              setCookie('user', response.data.playerid, { path: '/' })
+              setCookie('playerPrivateKey', response.data.playerPrivateKey, { path: '/' })
+              setCookie('playerPublicKey', response.data.playerPublicKey, { path: '/' })
             }
             ).catch((error) => {
               console.error(error)
@@ -142,9 +142,9 @@ export function GameTable({ games: data }: GameTableProps) {
   const createGame = () => {
     if (gameName.length > 0) {
       axios.post("http://localhost:3000/api/game/create", { name: gameName, userName: userName }).then((response) => {
-        console.log(response)
         setCookie('game', response.data.id, { path: '/' })
-        setCookie('user', response.data.playerid, { path: '/' })
+        setCookie('playerPrivateKey', response.data.playerPrivateKey, { path: '/' })
+        setCookie('playerPublicKey', response.data.playerPublicKey, { path: '/' })
         navigate(response.data.id)
       }
       ).catch((error) => {
