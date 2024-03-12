@@ -29,11 +29,13 @@ export default function GameListPage() {
   const [games, setGames] = useState<Game[]>([])
   const [cookies, setCookie, removeCookie] = useCookies(['game', 'playerPrivateKey', "playerPublicKey"]);
   const [isOpen, setIsOpen] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   const getGamesData = async () => {
     const response = await axios.get("http://localhost:3000/api/game")
     toast.success("Games loaded")
     setGames(response.data)
+    setIsLoaded(true)
   }
   
   useEffect(() => {
@@ -44,13 +46,18 @@ export default function GameListPage() {
           setIsOpen(true)
         }
       }).catch(error => {
-        quitGame()
+        axios.post(`http://localhost:3000/api/game/quit-any`, {
+          playerPrivateKey: cookies.playerPrivateKey,
+        })
+        removeCookie("game")
+        removeCookie("playerPrivateKey")
+        removeCookie("playerPublicKey")
       } 
       )
     }
     getGamesData()
   }
-  , [cookies.game, cookies.playerPrivateKey, cookies.playerPublicKey])
+  , [cookies.game, cookies.playerPrivateKey, cookies.playerPublicKey, removeCookie])
 
   const reconnect = () => {
     navigate("/"+cookies.game)
@@ -83,7 +90,7 @@ export default function GameListPage() {
       </AlertDialogContent>
     </AlertDialog>
 
-                
+      {isLoaded ? <></> : <div className="flex justify-center items-center h-screen"><div className="loader"></div></div>}    
       <div className="flex flex-row mt-3 ml-3">
         <div className="basis-3/4">
           <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
