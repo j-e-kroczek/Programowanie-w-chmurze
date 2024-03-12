@@ -43,8 +43,8 @@ export default function Page({ params }: { params: { slug: string } }) {
 
     async function onGameUpdate() {
         try {
-            const response = await fetch(`http://localhost:3000/api/game/${params.slug}`);
-            const data = await response.json();
+            const response = await axios.get(`http://localhost:3000/api/game/${params.slug}`);
+            const data = await response.data;
             setGameData(data);
             setBoard(data.board);
         }
@@ -178,7 +178,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     {gameData !== null && gameData.name}
                                     <div>
                                         <Badge variant="default">
-                                            {gameData?.status === "winner" ? "Winner" : gameData?.status === "draw" ? "Draw" : "In progress"}
+                                            {gameData?.status === "winner" ? "Winner" : gameData?.status === "draw" ? "Draw" : gameData?.status === "in-progress" ? "In progress" : "Pending"}
                                         </Badge>
                                     </div>
                                 </div>
@@ -202,7 +202,10 @@ export default function Page({ params }: { params: { slug: string } }) {
                             {board !== null && <Board board={board} makeMove={makeMove} />}
                         </CardContent>
                         <CardFooter>
-                            {isConnected ? <Badge variant="default">Connected</Badge> : <Badge variant="destructive">Disconnected, try to refresh</Badge>}
+                            <div className="w-full flex justify-between">
+                                {isConnected ? <Badge variant="default">Connected</Badge> : <Badge variant="destructive">Disconnected, try to refresh</Badge>}
+                                <Button variant="secondary" onClick={quitGame}>Quit game</Button>
+                            </div>
                         </CardFooter>
                     </Card></>
         : <p>Loading...</p>}

@@ -50,7 +50,6 @@ export class GameService {
       },
       currentPlayer: null,
       status: 'pending',
-      socketUsers: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -110,11 +109,15 @@ export class GameService {
         game.player1 = null;
         game.player1pub = null;
         game.player1Name = null;
+        game.currentPlayer = 'p1';
+        game.status = 'pending';
       }
       if (game.player2 === playerId) {
         game.player2 = null;
         game.player2pub = null;
         game.player2Name = null;
+        game.currentPlayer = 'p2';
+        game.status = 'pending';
       }
       this.update(game.id, game);
     });
@@ -148,7 +151,13 @@ export class GameService {
   }
 
   startGame(game: Game): void {
-    game.currentPlayer = game.player1pub;
+    if (game.currentPlayer === 'p1') {
+      game.currentPlayer = game.player1pub;
+    } else if (game.currentPlayer === 'p2') {
+      game.currentPlayer = game.player2pub;
+    } else {
+      game.currentPlayer = game.player1pub;
+    }
     game.status = 'in-progress';
     this.update(game.id, game);
   }
@@ -256,7 +265,10 @@ export class GameService {
       ],
     };
     if (game.player1 !== null && game.player2 !== null) {
-      game.currentPlayer = game.player1pub;
+      game.currentPlayer =
+        game.player1pub === game.currentPlayer
+          ? game.player2pub
+          : game.player1pub;
       game.status = 'in-progress';
       game.updatedAt = new Date();
       this.update(game.id, game);
@@ -265,18 +277,5 @@ export class GameService {
       game.updatedAt = new Date();
       this.update(game.id, game);
     }
-  }
-
-  addSocketUser(gameId: string, socketId: string): void {
-    const game = this.findOne(gameId);
-    game.socketUsers.push(socketId);
-    this.update(gameId, game);
-  }
-
-  removeSocketUser(gameId: string, socketId: string): void {
-    const game = this.findOne(gameId);
-    const index = game.socketUsers.indexOf(socketId);
-    game.socketUsers.splice(index, 1);
-    this.update(gameId, game);
   }
 }

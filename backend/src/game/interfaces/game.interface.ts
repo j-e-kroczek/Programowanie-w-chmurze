@@ -1,5 +1,4 @@
 import {
-  IsArray,
   IsDate,
   IsEnum,
   IsNotEmpty,
@@ -47,9 +46,6 @@ export class Game {
   @IsNotEmpty()
   @IsEnum(['pending', 'in-progress', 'winner', 'draw'])
   status: string;
-
-  @IsArray()
-  socketUsers: string[];
 
   @IsDate()
   createdAt: Date;
