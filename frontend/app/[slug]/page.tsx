@@ -231,7 +231,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                         <h3 className="text-2xl font-bold tracking-tight">{gameData?.player1Name != null ? gameData.player1Name : "N/A"}</h3>
                                         <p className="text-muted-foreground">Player 1</p>
                                     </div>         
-                                    {confetti && <ConfettiExplosion force={0.8} duration={3000} particleCount={250} width={1600} zIndex={10}/>}
+                                    {confetti && <ConfettiExplosion force={0.7} duration={2700} particleCount={200} width={1600}/>}
                                     {gameData?.status==="in-progress" && (gameData?.currentPlayer === cookies.playerPublicKey ? "Your turn": "Opponent's turn")}
                                     <div>
                                         <h3 className="text-2xl font-bold tracking-tight">{gameData?.player2Name != null ? gameData.player2Name : "N/A"}</h3>
