@@ -53,6 +53,18 @@ export class GameGateway
     }
   }
 
+  @SubscribeMessage('leaveGame')
+  handleLeaveGame(client: any, payload: any) {
+    const game = this.gameService.findOne(payload);
+    if (game) {
+      this.logger.log(`Client id: ${client.id} left game ${game.id}`);
+      client.leave(game.id);
+      client.to(game.id).emit('playerLeft');
+    } else {
+      client.emit('gameError', 'Game not found');
+    }
+  }
+
   @SubscribeMessage('updateGame')
   handleUpdateGame(client: any, payload: any) {
     const game = this.gameService.findOne(payload);

@@ -59,6 +59,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     socket.on('disconnect', onDisconnect);
     socket.on('gameUpdated', onGameUpdate);
     socket.on('playerJoined', onGameUpdate);
+    socket.on('playerLeft', onGameUpdate);
     connectToGame();
 
     return () => {
@@ -129,8 +130,10 @@ export default function Page({ params }: { params: { slug: string } }) {
         }
         );
         if(response){
-            const data = await response.data;
-            console.log(data);
+            removeCookie("game");
+            removeCookie("playerPrivateKey");
+            removeCookie("playerPublicKey");
+            socket.emit('leaveGame', params.slug);
             navigate("/");
         }
     }

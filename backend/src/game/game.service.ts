@@ -110,7 +110,12 @@ export class GameService {
         game.player1pub = null;
         game.player1Name = null;
         game.currentPlayer = 'p1';
-        game.status = 'pending';
+        if (game.status === 'winner' || game.status === 'draw') {
+          console.log('restart game');
+          this.restartGame(game);
+        } else {
+          game.status = 'pending';
+        }
       }
       if (game.player2 === playerId) {
         game.player2 = null;
