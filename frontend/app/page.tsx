@@ -7,22 +7,11 @@ import { ModeToggle } from "@/components/ui/theme-toggle"
 import { GameTable } from "./game-table"
 import axios from "axios"
 import { Game } from "./types/game"
-import { socket } from "./service/socket"
 import { use, useEffect, useState } from "react"
 
 export default function GameListPage() {
 
   const [games, setGames] = useState<Game[]>([])
-  const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-      socket.emit('HELLO_THERE');
-      const eventHandler = () => setConnected(true);
-      socket.on('WELCOME_FROM_SERVER', eventHandler);
-      return () => {
-         socket.off('WELCOME_FROM_SERVER', eventHandler);
-      };
-   }, []);
 
   const getGamesData = async () => {
     const response = await axios.get("http://localhost:3000/api/game")
@@ -35,15 +24,6 @@ export default function GameListPage() {
     })
   }
   , [])
-
-   useEffect(() => {
-    socket.on("game-created", (data) => {
-      getGamesData().then((data) => {
-        setGames(data)
-      }
-      )
-    });
-  }, []);
   
   return (
     <>
