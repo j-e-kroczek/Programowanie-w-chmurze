@@ -215,7 +215,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     <p className="text-muted-foreground">Player 2</p>
                                 </div>
                             </div>
-                            {board !== null && <Board board={board} makeMove={makeMove} />}
+                            {board !== null && <Board board={board} makeMove={makeMove} isPlayerTurn={gameData?.currentPlayer === cookies.playerPublicKey} />}
                         </CardContent>
                         <CardFooter>
                             <div className="w-full flex justify-between">
