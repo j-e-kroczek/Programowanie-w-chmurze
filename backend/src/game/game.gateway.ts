@@ -47,6 +47,7 @@ export class GameGateway
     if (game) {
       this.logger.log(`Client id: ${client.id} joined game ${game.id}`);
       client.join(game.id);
+      client.to(game.id).emit('playerJoined');
     } else {
       client.emit('gameError', 'Game not found');
     }
@@ -57,7 +58,7 @@ export class GameGateway
     const game = this.gameService.findOne(payload);
     if (game) {
       this.logger.log(`Client id: ${client.id} updated game ${game.id}`);
-      client.to(game.id).emit('gameUpdated', game.board);
+      client.to(game.id).emit('gameUpdated');
     } else {
       client.emit('gameError', 'Game not found');
     }

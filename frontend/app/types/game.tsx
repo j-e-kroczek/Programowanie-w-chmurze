@@ -22,7 +22,9 @@ export type Game = {
   id: string;
   name: string;
   player1Name: string;
+  player1pub: string;
   player2Name: string;
+  player2pub: string;
   board: TicTacToeBoard;
   currentPlayer: string;
   status: GameStatus;

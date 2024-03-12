@@ -106,4 +106,50 @@ export class GameController {
     }
     throw new HttpException('Invalid move', 400);
   }
+
+  @Post(':id/restart')
+  @UseInterceptors(ClassSerializerInterceptor)
+  restartGame(
+    @Param('id') id: string,
+    @Body() body: { playerPrivateKey: string; playerPublicKey: string },
+  ) {
+    const game = this.gameService.findOne(id);
+    if (!game) {
+      throw new HttpException('Game not found', 404);
+    }
+    if (
+      !this.gameService.authPlayer(
+        game.id,
+        body.playerPrivateKey,
+        body.playerPublicKey,
+      )
+    ) {
+      throw new HttpException('Auth fail', 400);
+    }
+    this.gameService.restartGame(game);
+    return this.gameService.findOne(id);
+  }
+
+  @Post(':id/quit')
+  quitGame(
+    @Param('id') id: string,
+    @Body() body: { playerPrivateKey: string; playerPublicKey: string },
+  ) {
+    const game = this.gameService.findOne(id);
+    if (!game) {
+      throw new HttpException('Game not found', 404);
+    }
+    if (
+      !this.gameService.authPlayer(
+        game.id,
+        body.playerPrivateKey,
+        body.playerPublicKey,
+      )
+    ) {
+      throw new HttpException('Auth fail', 400);
+    }
+    this.gameService.removePlayerFromAllGames(body.playerPrivateKey);
+    this.gameService.removeEmptyGames();
+    return { message: 'Game quit' };
+  }
 }

@@ -108,9 +108,13 @@ export class GameService {
     this.games.forEach((game) => {
       if (game.player1 === playerId) {
         game.player1 = null;
+        game.player1pub = null;
+        game.player1Name = null;
       }
       if (game.player2 === playerId) {
         game.player2 = null;
+        game.player2pub = null;
+        game.player2Name = null;
       }
       this.update(game.id, game);
     });
@@ -182,6 +186,16 @@ export class GameService {
     }
     game.board.board[row].row[column].value =
       playerPrivKey === game.player1 ? 'P1' : 'P2';
+    const winner = this.getGameWinner(game);
+    if (winner !== null) {
+      game.currentPlayer = winner === 'P1' ? game.player1pub : game.player2pub;
+      game.status = 'winner';
+      return true;
+    }
+    if (this.isGameDraw(game)) {
+      game.status = 'draw';
+      return true;
+    }
     game.currentPlayer =
       playerPubKey === game.player1pub ? game.player2pub : game.player1pub;
     game.updatedAt = new Date();
@@ -189,22 +203,67 @@ export class GameService {
     return true;
   }
 
-  isGameWinner(game: Game): boolean {
-    const board = game.board.board;
-    console.log(board);
-    return false;
+  getGameWinner(game: Game): 'P1' | 'P2' | null {
+    const board = game.board;
+    for (const row of board.board) {
+      if (row.row.every((cell) => cell.value === 'P1')) return 'P1';
+      if (row.row.every((cell) => cell.value === 'P2')) return 'P2';
+    }
+
+    for (let i = 0; i < 3; i++) {
+      if (
+        board.board[0].row[i].value === 'P1' &&
+        board.board[1].row[i].value === 'P1' &&
+        board.board[2].row[i].value === 'P1'
+      )
+        return 'P1';
+      if (
+        board.board[0].row[i].value === 'P2' &&
+        board.board[1].row[i].value === 'P2' &&
+        board.board[2].row[i].value === 'P2'
+      )
+        return 'P2';
+    }
+
+    if (
+      (board.board[0].row[0].value === 'P1' &&
+        board.board[1].row[1].value === 'P1' &&
+        board.board[2].row[2].value === 'P1') ||
+      (board.board[0].row[2].value === 'P1' &&
+        board.board[1].row[1].value === 'P1' &&
+        board.board[2].row[0].value === 'P1')
+    )
+      return 'P1';
+
+    if (
+      (board.board[0].row[0].value === 'P2' &&
+        board.board[1].row[1].value === 'P2' &&
+        board.board[2].row[2].value === 'P2') ||
+      (board.board[0].row[2].value === 'P2' &&
+        board.board[1].row[1].value === 'P2' &&
+        board.board[2].row[0].value === 'P2')
+    )
+      return 'P2';
+    return null;
   }
 
-  checkGameStatus(game: Game): void {
-    if (this.isGameDraw(game)) {
-      game.status = 'draw';
+  restartGame(game: Game): void {
+    game.board = {
+      board: [
+        { row: [{ value: null }, { value: null }, { value: null }] },
+        { row: [{ value: null }, { value: null }, { value: null }] },
+        { row: [{ value: null }, { value: null }, { value: null }] },
+      ],
+    };
+    if (game.player1 !== null && game.player2 !== null) {
+      game.currentPlayer = game.player1pub;
+      game.status = 'in-progress';
+      game.updatedAt = new Date();
       this.update(game.id, game);
-      return;
-    }
-    if (this.isGameWinner(game)) {
-      game.status = 'winner';
+    } else {
+      game.status = 'pending';
+      game.updatedAt = new Date();
       this.update(game.id, game);
-      return;
     }
   }
 
