@@ -32,7 +32,7 @@ export default function GameListPage() {
   const [isLoaded, setIsLoaded] = useState(false)
 
   const getGamesData = async () => {
-    const response = await axios.get("http://localhost:3000/api/game")
+    const response = await axios.get(process.env.API_URL + "/game")
     toast.success("Games loaded")
     setGames(response.data)
     setIsLoaded(true)
@@ -40,13 +40,13 @@ export default function GameListPage() {
   
   useEffect(() => {
     if (cookies.playerPrivateKey !== undefined) {
-      const response = axios.get(`http://localhost:3000/api/game/${cookies.game}`)
+      const response = axios.get(process.env.API_URL + `/game/${cookies.game}`)
       .then(response => {
         if (response.data.player1pub === cookies.playerPublicKey || response.data.player2pub === cookies.playerPublicKey) {
           setIsOpen(true)
         }
       }).catch(error => {
-        axios.post(`http://localhost:3000/api/game/quit-any`, {
+        axios.post(process.env.API_URL + "/game/quit-any", {
           playerPrivateKey: cookies.playerPrivateKey,
         })
         removeCookie("game")
@@ -64,7 +64,7 @@ export default function GameListPage() {
   }
 
   const quitGame = async () => {
-    axios.post(`http://localhost:3000/api/game/quit-any`, {
+    axios.post(process.env.API_URL + "/game/quit-any", {
       playerPrivateKey: cookies.playerPrivateKey,
     })
     removeCookie("game")

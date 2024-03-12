@@ -49,7 +49,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
     async function onGameUpdate() {
         try {
-            const response = await axios.get(`http://localhost:3000/api/game/${params.slug}`);
+            const response = await axios.get(`${process.env.API_URL}/game/${params.slug}`);
             const data = await response.data;
             setGameData(data);
             setBoard(data.board);
@@ -78,7 +78,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     
     const getGameData = async () => {
         try {
-        const response = await fetch(`http://localhost:3000/api/game/${params.slug}`);
+        const response = await fetch(`${process.env.API_URL}/game/${params.slug}`);
         const data = await response.json();
         setGameData(data);
         setBoard(data.board);
@@ -93,7 +93,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
 
     const makeMove = async (row: number, column: number) => {
-        const response = await axios.post(`http://localhost:3000/api/game/${params.slug}/move`, {
+        const response = await axios.post(`${process.env.API_URL}/game/${params.slug}/move`, {
             playerPrivateKey: cookies.playerPrivateKey,
             playerPublicKey: cookies.playerPublicKey,
             row: row,
@@ -111,7 +111,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
 
     const restartGame = async () => {
-        const response = await axios.post(`http://localhost:3000/api/game/${params.slug}/restart`, {
+        const response = await axios.post(`${process.env.API_URL}/game/${params.slug}/restart`, {
             playerPrivateKey: cookies.playerPrivateKey,
             playerPublicKey: cookies.playerPublicKey
         }).catch((error) => {
@@ -127,7 +127,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
 
     const quitGame = async () => {
-        const response = await axios.post(`http://localhost:3000/api/game/${params.slug}/quit`, {
+        const response = await axios.post(`${process.env.API_URL}/game/${params.slug}/quit`, {
             playerPrivateKey: cookies.playerPrivateKey,
             playerPublicKey: cookies.playerPublicKey
         }).catch(async (error) => {

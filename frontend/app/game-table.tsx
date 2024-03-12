@@ -102,7 +102,7 @@ export function GameTable({ games: data, refresh }: GameTableProps) {
           size="sm"
           disabled={game.status !== "pending" || userName.length===0}
           onClick={() => {
-            axios.post("http://localhost:3000/api/game/join/"+game.id, { userName: userName }).then((response) => {
+            axios.post(process.env.API_URL + "/game/join/"+game.id, { userName: userName }).then((response) => {
               navigate(game.id)
               setCookie('game', game.id, { path: '/' })
               setCookie('playerPrivateKey', response.data.playerPrivateKey, { path: '/' })
@@ -142,7 +142,7 @@ export function GameTable({ games: data, refresh }: GameTableProps) {
 
   const createGame = () => {
     if (gameName.length > 0) {
-      axios.post("http://localhost:3000/api/game/create", { name: gameName, userName: userName }).then((response) => {
+      axios.post(process.env.API_URL + "/game/create", { name: gameName, userName: userName }).then((response) => {
         setCookie('game', response.data.id, { path: '/' })
         setCookie('playerPrivateKey', response.data.playerPrivateKey, { path: '/' })
         setCookie('playerPublicKey', response.data.playerPublicKey, { path: '/' })
