@@ -7,6 +7,7 @@ import { ModeToggle } from "@/components/ui/theme-toggle"
 import { GameTable } from "./game-table"
 import axios from "axios"
 import { Game } from "./types/game"
+import toast from "react-hot-toast"
 import { use, useEffect, useState } from "react"
 
 export default function GameListPage() {
@@ -15,13 +16,12 @@ export default function GameListPage() {
 
   const getGamesData = async () => {
     const response = await axios.get("http://localhost:3000/api/game")
-    return response.data
+    toast.success("Games loaded")
+    setGames(response.data)
   }
   
   useEffect(() => {
-    getGamesData().then((data) => {
-      setGames(data)
-    })
+    getGamesData()
   }
   , [])
   
@@ -36,7 +36,7 @@ export default function GameListPage() {
         <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
       </div>
       <div className="flex flex-row m-3">
-        <GameTable games={games}></GameTable>
+        <GameTable games={games} refresh={getGamesData}></GameTable>
       </div>
     </> 
   )

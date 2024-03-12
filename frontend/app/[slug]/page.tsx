@@ -148,7 +148,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             <AlertDialog defaultOpen={true}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>{gameData.currentPlayer === gameData.player1pub ? "Player 1 has won!" : "Player 2 has won!"}</AlertDialogTitle>
+                            <AlertDialogTitle>{gameData.currentPlayer === gameData.player1pub ? "Player 1 ("+gameData.player1Name+") has won!" : "Player 2 ("+gameData.player2Name+") has won!"}</AlertDialogTitle>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <Button variant={"secondary"} onClick={quitGame}>Back to home</Button>

@@ -44,9 +44,10 @@ import { navigate } from "./actions"
 
 interface GameTableProps {
   games: Game[];
+  refresh: () => void;
 }
 
-export function GameTable({ games: data }: GameTableProps) {
+export function GameTable({ games: data, refresh }: GameTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -247,7 +248,14 @@ export function GameTable({ games: data }: GameTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-between space-x-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refresh}
+          >
+            Refresh
+          </Button>
         <div className="space-x-2">
           <Button
             variant="outline"
