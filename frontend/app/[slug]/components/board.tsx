@@ -2,7 +2,6 @@ import { TicTacToeBoard, TicTacToeCell } from "@/app/types/game";
 import "./board.css";
 
 export default function Board({ board, makeMove, isPlayerTurn }: { board: TicTacToeBoard, makeMove: (row: number, column: number) => void, isPlayerTurn: boolean}) {
-  console.log(isPlayerTurn);
   
   const getClassName = (cell: TicTacToeCell, isPlayerTurn: boolean) => {
     switch (cell.value) {

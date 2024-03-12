@@ -19,6 +19,8 @@ import { AlertDialog,
   } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/theme-toggle";
+import ConfettiExplosion from 'react-confetti-explosion';
+import { cp } from "fs";
 
 function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
@@ -31,6 +33,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [isLoaded, setIsLoaded] = useState(false);
     const [tryCount, setTryCount] = useState(0);
+    const [confetti, setConfetti] = useState(false);
 
     useEffect(() => {
     function onConnect() {
@@ -51,6 +54,9 @@ export default function Page({ params }: { params: { slug: string } }) {
         try {
             const response = await axios.get(`${process.env.API_URL}/game/${params.slug}`);
             const data = await response.data;
+            if(data.status === "winner" && data.currentPlayer === cookies.playerPublicKey){
+                setConfetti(true);
+            }
             setGameData(data);
             setBoard(data.board);
         }
@@ -82,6 +88,11 @@ export default function Page({ params }: { params: { slug: string } }) {
         const data = await response.json();
         setGameData(data);
         setBoard(data.board);
+        if(data.status === "winner" && data.currentPlayer === cookies.playerPublicKey){
+            setConfetti(true);    
+        }else{
+            setConfetti(false);
+        }
         setIsLoaded(true);
         }
         catch (error) {
@@ -104,6 +115,11 @@ export default function Page({ params }: { params: { slug: string } }) {
         );
         if(response){
             const data = await response.data;
+            if(data.status === "winner" && data.currentPlayer === cookies.playerPublicKey){
+                setConfetti(true);    
+            }else{
+                setConfetti(false);
+            }
             setGameData(data);
             setBoard(data.board);
             socket.emit('updateGame', params.slug);
@@ -157,12 +173,14 @@ export default function Page({ params }: { params: { slug: string } }) {
     });
 
     return (
-        <><div className="flex flex-row mt-3 ml-3">
+        <>
+        <div className="flex flex-row mt-3 ml-3">
             <div className="basis-3/4">
                 <h2 className="text-2xl font-bold tracking-tight">Tic Tac Toe</h2>
-</div>
+            </div>
             <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
-        </div><div className="h-screen flex items-center justify-center">
+        </div>
+        <div className="h-screen flex items-center justify-center">
                 {isLoaded ?
 
                     <>
@@ -212,7 +230,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     <div>
                                         <h3 className="text-2xl font-bold tracking-tight">{gameData?.player1Name != null ? gameData.player1Name : "N/A"}</h3>
                                         <p className="text-muted-foreground">Player 1</p>
-                                    </div>
+                                    </div>         
+                                    {confetti && <ConfettiExplosion force={0.8} duration={3000} particleCount={250} width={1600} zIndex={10}/>}
                                     {gameData?.status==="in-progress" && (gameData?.currentPlayer === cookies.playerPublicKey ? "Your turn": "Opponent's turn")}
                                     <div>
                                         <h3 className="text-2xl font-bold tracking-tight">{gameData?.player2Name != null ? gameData.player2Name : "N/A"}</h3>
