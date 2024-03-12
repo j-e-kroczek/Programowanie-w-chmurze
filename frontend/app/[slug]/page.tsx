@@ -18,6 +18,7 @@ import { AlertDialog,
   AlertDialogTitle,
   } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ui/theme-toggle";
 
 function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
@@ -156,75 +157,78 @@ export default function Page({ params }: { params: { slug: string } }) {
     });
 
     return (
-        <div className="h-screen flex items-center justify-center">
-            {isLoaded ?
+        <><div className="flex flex-row mt-3 ml-3">
+            <div className="basis-3/4">
+                <h2 className="text-2xl font-bold tracking-tight">Tic Tac Toe</h2>
+</div>
+            <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
+        </div><div className="h-screen flex items-center justify-center">
+                {isLoaded ?
 
-            <>
-            {gameData?.status === "winner" &&
-            <AlertDialog defaultOpen={true}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>{gameData.currentPlayer === gameData.player1pub ? "Player 1 ("+gameData.player1Name+") has won!" : "Player 2 ("+gameData.player2Name+") has won!"}</AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <Button variant={"secondary"} onClick={quitGame}>Back to home</Button>
-                            {gameData.currentPlayer === cookies.playerPublicKey && <Button onClick={restartGame}>Play again</Button>}
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            }
-            {gameData?.status === "draw" &&
-            <AlertDialog defaultOpen={true}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>It&apos;s a draw!</AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <Button variant={"secondary"} onClick={quitGame}>Back to home</Button>
-                            {gameData.currentPlayer === cookies.playerPublicKey && <Button onClick={restartGame}>Play again</Button>}
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            }
-                
-                <Card className="w-[700px]">
-                        <CardHeader>
-                            <CardTitle>
+                    <>
+                        {gameData?.status === "winner" &&
+                            <AlertDialog defaultOpen={true}>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>{gameData.currentPlayer === gameData.player1pub ? "Player 1 (" + gameData.player1Name + ") has won!" : "Player 2 (" + gameData.player2Name + ") has won!"}</AlertDialogTitle>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <Button variant={"secondary"} onClick={quitGame}>Back to home</Button>
+                                        {gameData.currentPlayer === cookies.playerPublicKey && <Button onClick={restartGame}>Play again</Button>}
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>}
+                        {gameData?.status === "draw" &&
+                            <AlertDialog defaultOpen={true}>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>It&apos;s a draw!</AlertDialogTitle>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <Button variant={"secondary"} onClick={quitGame}>Back to home</Button>
+                                        {gameData.currentPlayer === cookies.playerPublicKey && <Button onClick={restartGame}>Play again</Button>}
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>}
+
+                        <Card className="w-[700px]">
+                            <CardHeader>
+                                <CardTitle>
+                                    <div className="flex justify-between">
+                                        {gameData !== null && gameData.name}
+                                        <div>
+                                            <Badge variant="default">
+                                                {gameData?.status === "winner" ? "Winner" : gameData?.status === "draw" ? "Draw" : gameData?.status === "in-progress" ? "In progress" : "Pending"}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardDescription className="ms-3">
+
+                            </CardDescription>
+                            <CardContent>
                                 <div className="flex justify-between">
-                                    {gameData !== null && gameData.name}
                                     <div>
-                                        <Badge variant="default">
-                                            {gameData?.status === "winner" ? "Winner" : gameData?.status === "draw" ? "Draw" : gameData?.status === "in-progress" ? "In progress" : "Pending"}
-                                        </Badge>
+                                        <h3 className="text-2xl font-bold tracking-tight">{gameData?.player1Name != null ? gameData.player1Name : "N/A"}</h3>
+                                        <p className="text-muted-foreground">Player 1</p>
+                                    </div>
+                                    {gameData?.currentPlayer === cookies.playerPublicKey && "Your turn"}
+                                    <div>
+                                        <h3 className="text-2xl font-bold tracking-tight">{gameData?.player2Name != null ? gameData.player2Name : "N/A"}</h3>
+                                        <p className="text-muted-foreground">Player 2</p>
                                     </div>
                                 </div>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardDescription className="ms-3">
-
-                        </CardDescription>
-                        <CardContent>
-                            <div className="flex justify-between">
-                                <div>
-                                    <h3 className="text-2xl font-bold tracking-tight">{gameData?.player1Name != null ? gameData.player1Name : "N/A"}</h3>
-                                    <p className="text-muted-foreground">Player 1</p>
+                                {board !== null && <Board board={board} makeMove={makeMove} isPlayerTurn={gameData?.currentPlayer === cookies.playerPublicKey} />}
+                            </CardContent>
+                            <CardFooter>
+                                <div className="w-full flex justify-between">
+                                    {isConnected ? <Badge variant="default">Connected</Badge> : <Badge variant="destructive">Disconnected, try to refresh</Badge>}
+                                    <Button variant="secondary" onClick={quitGame}>Quit game</Button>
                                 </div>
-                                {gameData?.currentPlayer === cookies.playerPublicKey && "Your turn"}
-                                <div>
-                                    <h3 className="text-2xl font-bold tracking-tight">{gameData?.player2Name != null ? gameData.player2Name : "N/A"}</h3>
-                                    <p className="text-muted-foreground">Player 2</p>
-                                </div>
-                            </div>
-                            {board !== null && <Board board={board} makeMove={makeMove} isPlayerTurn={gameData?.currentPlayer === cookies.playerPublicKey} />}
-                        </CardContent>
-                        <CardFooter>
-                            <div className="w-full flex justify-between">
-                                {isConnected ? <Badge variant="default">Connected</Badge> : <Badge variant="destructive">Disconnected, try to refresh</Badge>}
-                                <Button variant="secondary" onClick={quitGame}>Quit game</Button>
-                            </div>
-                        </CardFooter>
-                    </Card></>
-        : <p>Loading...</p>}
-        </div>
+                            </CardFooter>
+                        </Card></>
+                    : <p>Loading...</p>}
+            </div></>
     );
 }
