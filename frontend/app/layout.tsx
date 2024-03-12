@@ -21,20 +21,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          > 
-          <Toaster 
-            position="bottom-right"
-            reverseOrder={false}
-            toastOptions={{
-              className: 'toast',
-          }}/>
-            {children}
-        </ThemeProvider>
+        <div className="flex justify-center max-w-lg flex-col mx-auto" style={{maxWidth: "60rem"}}>
+          <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            > 
+            <Toaster 
+              position="bottom-right"
+              reverseOrder={false}
+              toastOptions={{
+                className: 'toast',
+            }}/>
+              {children}
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );

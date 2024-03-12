@@ -163,18 +163,18 @@ export function GameTable({ games: data, refresh }: GameTableProps) {
         </Button>
         <Input
           placeholder="Game name"
-          className="w-64"
+          className="lg:block w-1/4"
           onChange={(e) => setGameName(e.target.value)}
           ></Input>
         <Input
           placeholder="Username"
-          className="w-64 ml-2"
+          className="ml-2 lg:block w-1/4"
           onChange={(e) => setUserName(e.target.value)}
           ></Input>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
+            <Button variant="outline" className="hidden lg:block ml-auto">
+              Columns
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
