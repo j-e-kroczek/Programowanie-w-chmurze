@@ -33,6 +33,13 @@ export class GameController {
     };
   }
 
+  @Post('quit-any')
+  quitAnyGame(@Body() body: { playerPrivateKey: string }) {
+    this.gameService.removePlayerFromAllGames(body.playerPrivateKey);
+    this.gameService.removeEmptyGames();
+    return { message: 'Game quit' };
+  }
+
   @Post('join/:id')
   joinGame(@Param('id') id: string, @Body() body: { userName: string }) {
     const game = this.gameService.findOne(id);

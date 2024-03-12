@@ -11,11 +11,24 @@ import toast from "react-hot-toast"
 import { use, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
 import { navigate } from "./actions"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 
 export default function GameListPage() {
 
   const [games, setGames] = useState<Game[]>([])
   const [cookies, setCookie, removeCookie] = useCookies(['game', 'playerPrivateKey', "playerPublicKey"]);
+  const [isOpen, setIsOpen] = useState(false)
 
   const getGamesData = async () => {
     const response = await axios.get("http://localhost:3000/api/game")
@@ -24,15 +37,53 @@ export default function GameListPage() {
   }
   
   useEffect(() => {
-    if (cookies.game !== undefined) {
-      navigate(`/${cookies.game}`)
+    if (cookies.playerPrivateKey !== undefined) {
+      const response = axios.get(`http://localhost:3000/api/game/${cookies.game}`)
+      .then(response => {
+        if (response.data.player1pub === cookies.playerPublicKey || response.data.player2pub === cookies.playerPublicKey) {
+          setIsOpen(true)
+        }
+      }).catch(error => {
+        quitGame()
+      } 
+      )
     }
     getGamesData()
   }
-  , [])
+  , [cookies.game, cookies.playerPrivateKey, cookies.playerPublicKey])
+
+  const reconnect = () => {
+    navigate("/"+cookies.game)
+  }
+
+  const quitGame = async () => {
+    axios.post(`http://localhost:3000/api/game/quit-any`, {
+      playerPrivateKey: cookies.playerPrivateKey,
+    })
+    removeCookie("game")
+    removeCookie("playerPrivateKey")
+    removeCookie("playerPublicKey")
+    setIsOpen(false)
+  }
   
   return (
     <>
+    <AlertDialog open={isOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Reconnect to game</AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogDescription>
+          You are still connected to a game. Do you want to reconnect?
+        </AlertDialogDescription>
+        <AlertDialogFooter>
+          <Button onClick={reconnect}>Reconnect</Button>
+          <Button variant={"secondary"} onClick={quitGame}>Cancel</Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+                
       <div className="flex flex-row mt-3 ml-3">
         <div className="basis-3/4">
           <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>

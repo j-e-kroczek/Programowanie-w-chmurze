@@ -19,12 +19,17 @@ import { AlertDialog,
   } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
+function timeout(delay: number) {
+    return new Promise( res => setTimeout(res, delay) );
+}
+
 export default function Page({ params }: { params: { slug: string } }) {
     const [cookies, setCookie, removeCookie] = useCookies(['game', 'playerPrivateKey', "playerPublicKey"]);
     const [gameData, setGameData] = useState<Game | null>(null);
     const [board, setBoard] = useState<TicTacToeBoard | null>(null);
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [tryCount, setTryCount] = useState(0);
 
     useEffect(() => {
     function onConnect() {
@@ -51,7 +56,6 @@ export default function Page({ params }: { params: { slug: string } }) {
         catch (error) {
             console.error(error);
             toast.error("Game not found");
-            quitGame();
         }
     }
 
@@ -82,7 +86,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         catch (error) {
             console.error(error);
             toast.error("Game not found");
-            quitGame();
+            navigate("/");
         }
         
     }
@@ -122,19 +126,29 @@ export default function Page({ params }: { params: { slug: string } }) {
     }
 
     const quitGame = async () => {
-        //Todo: remove player from game
         const response = await axios.post(`http://localhost:3000/api/game/${params.slug}/quit`, {
             playerPrivateKey: cookies.playerPrivateKey,
             playerPublicKey: cookies.playerPublicKey
-        }).catch((error) => {
-            
+        }).catch(async (error) => {
+            if(tryCount < 3){
+                setTryCount(tryCount + 1);
+                await timeout(1000);
+                quitGame();
+                return;
+            }
+            removeCookie("game");
+            removeCookie("playerPrivateKey");
+            removeCookie("playerPublicKey");
+            socket.emit('leaveGame', params.slug);
+            navigate("/");
         }
-        );
-        removeCookie("game");
-        removeCookie("playerPrivateKey");
-        removeCookie("playerPublicKey");
-        socket.emit('leaveGame', params.slug);
-        navigate("/");
+        ).then(() => {
+            removeCookie("game");
+            removeCookie("playerPrivateKey");
+            removeCookie("playerPublicKey");
+            socket.emit('leaveGame', params.slug);
+            navigate("/");
+        });
     }
 
     useState(() => {
