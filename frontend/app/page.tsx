@@ -90,18 +90,18 @@ export default function GameListPage() {
       </AlertDialogContent>
     </AlertDialog>
 
-      {isLoaded ? <></> : <div className="flex justify-center items-center h-screen"><div className="loader"></div></div>}    
-      <div className="flex flex-row mt-3 ml-3">
-        <div className="basis-3/4">
-          <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
+      {isLoaded ?      
+      <><div className="flex flex-row mt-3 ml-3">
+          <div className="basis-3/4">
+            <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
             <p className="text-muted-foreground">
               Here are list of available games
             </p></div>
-        <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
-      </div>
-      <div className="flex flex-row m-3">
-        <GameTable games={games} refresh={getGamesData}></GameTable>
-      </div>
+          <div className="basis-1/4 flex justify-end me-3"><ModeToggle></ModeToggle></div>
+        </div><div className="flex flex-row m-3">
+            <GameTable games={games} refresh={getGamesData}></GameTable>
+          </div></>
+      : <div className="flex justify-center items-center h-screen"><div className="loader"></div></div>}
     </> 
   )
 }
