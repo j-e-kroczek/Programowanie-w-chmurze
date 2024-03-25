@@ -6,10 +6,12 @@ import {
   IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 type Cell = 'P1' | 'P2' | null;
 
 class TicTacToeCell {
+  @ApiProperty()
   @IsIn(['X', 'O', null])
   value: Cell;
 
@@ -19,6 +21,7 @@ class TicTacToeCell {
 }
 
 class TicTacToeRow {
+  @ApiProperty()
   @IsArray()
   @ArrayMinSize(3)
   @ArrayMaxSize(3)
@@ -32,6 +35,7 @@ class TicTacToeRow {
 }
 
 export class TicTacToeBoard {
+  @ApiProperty()
   @IsArray()
   @ArrayMinSize(3)
   @ArrayMaxSize(3)

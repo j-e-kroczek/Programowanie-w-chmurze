@@ -33,7 +33,7 @@ export class GameGateway
     const { sockets } = this.io.sockets;
 
     this.logger.log(`Client id: ${client.id} connected`);
-    this.logger.debug(`Number of connected clients: ${sockets.size}`);
+    this.logger.debug(`Connected clients: ${sockets.size}`);
   }
 
   handleDisconnect(client: any) {
