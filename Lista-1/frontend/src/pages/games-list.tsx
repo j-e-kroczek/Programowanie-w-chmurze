@@ -22,6 +22,10 @@ export const GamesList: React.FC = () => {
     setIsCreatingGame(true);
   };
 
+  const handleCancel = () => {
+    setIsCreatingGame(false);
+  };
+
   useEffect(() => {
     axios.get(gameListApi).then((response) => {
       setGameList(response.data);
@@ -80,12 +84,17 @@ export const GamesList: React.FC = () => {
 
   return (
     <div>
-      {isCreatingGame && <CreateGame handleSubmit={handleNewGameCreation} />}
+      {isCreatingGame && (
+        <CreateGame
+          handleCancel={handleCancel}
+          handleSubmit={handleNewGameCreation}
+        />
+      )}
       <div className="flex items-start w-full flex-col">
-        <div className="flex flex-wrap w-full items-center justify-between pb-10">
-          <h1 className="text-3xl font-medium py-6">Available games</h1>
+        <div className="flex flex-wrap w-full items-center justify-center sm:justify-between mb-10 px-4 py-2 bg-white rounded-full">
+          <h1 className="text-3xl font-medium p-3 ">Available games</h1>
           <button
-            className="flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-2 px-6 rounded-full focus:outline-none	"
+            className="flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-2 px-6 rounded-full focus:outline-none"
             type="button"
             onClick={handleNewGame}
           >

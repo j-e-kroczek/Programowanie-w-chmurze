@@ -8,11 +8,29 @@
   .game-board {
     --width: 500px;
   }
+  .circle::before {
+    content: "\25EF";
+    font-size: 100px;
+  }
+
+  .cross::before {
+    content: "\1F7A8";
+    font-size: 130px;
+  }
 }
 
 @media (min-width: 320px) and (max-width: 540px) {
   .game-board {
     --width: 300px;
+  }
+  .circle::before {
+    content: "\25EF";
+    font-size: 60px;
+  }
+
+  .cross::before {
+    content: "\1F7A8";
+    font-size: 75px;
   }
 }
 
@@ -28,17 +46,20 @@
   vertical-align: middle;
   border-color: #805ad5;
   cursor: pointer;
+  transition: 0.3s ease;
 }
 
 .cross,
 .circle {
   background-color: #e9d8fd;
   cursor: default;
+  transition: 0.3s ease;
 }
 
 .cross:hover,
 .circle:hover {
   background-color: #e9d8fd !important;
+  transition: 0.3s ease;
 }
 
 .cross::before,
@@ -52,16 +73,15 @@
 
 .circle::before {
   content: "\25EF";
-  font-size: 100px;
 }
 
 .cross::before {
   content: "\1F7A8";
-  font-size: 125px;
 }
 
 .cell:hover {
   background-color: #faf5ff;
+  transition: 0.3s ease;
 }
 
 .bottom {

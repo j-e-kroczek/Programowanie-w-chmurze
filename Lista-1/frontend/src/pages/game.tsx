@@ -29,6 +29,8 @@ export const Game: React.FC<{}> = () => {
 
   const restartGameApi = "http://localhost:3000/api/game/" + id + "/restart";
 
+  const quitGameApi = "http://localhost:3000/api/game/" + id + "/quit";
+
   const [currentPlayerName, setCurrentPlayerName] = useState<
     string | undefined
   >("");
@@ -61,6 +63,20 @@ export const Game: React.FC<{}> = () => {
       })
       .catch(function (error) {
         toast.error(error.response.data.message || "Error restarting game");
+      });
+  };
+
+  const handleLeave = () => {
+    axios
+      .post(quitGameApi, {
+        playerId: playerId,
+      })
+      .then(function () {
+        socket.emit("leaveGame", id);
+        window.location.href = "/games-list";
+      })
+      .catch(function (error) {
+        toast.error(error.response.data.message || "Error quiting game");
       });
   };
 
@@ -104,16 +120,35 @@ export const Game: React.FC<{}> = () => {
         <GameInfo
           status={game.status}
           currentPlayer={currentPlayerName}
-          isWinner={game.currentPlayer === playerId}
+          isCurrentPlayer={game.currentPlayer === playerId}
           handleRestart={handleRestart}
+          handleLeave={handleLeave}
         />
       )}
       <div className="flex items-start w-full flex-col">
-        <h1 className="text-3xl font-medium pb-7">{game?.name}</h1>
-        <div className="flex justify-between w-full text-xl">
-          <div>Player 1: {game.player1Name ? game.player1Name : "-"}</div>
-          <div>User turn: {currentPlayerName ? currentPlayerName : "-"}</div>
-          <div>Player 2: {game.player2Name ? game.player2Name : "-"}</div>
+        <div className="flex flex-wrap w-full items-center justify-center lg:justify-between mb-2 px-4 py-2 bg-white rounded-full">
+          <h1 className="text-3xl font-medium p-3">{game?.name}</h1>
+          <div className="flex flex-wrap justify-center sm:justify-between w-100">
+            <div className="my-1 mx-5 order-1">
+              <strong className="me-2 text-purple-700">Player 1:</strong>{" "}
+              {game.player1Name ? game.player1Name : "-"}
+            </div>
+            <div className="my-1 mx-5 order-3 sm:order-2">
+              <strong className="me-2 text-purple-700">User turn:</strong>{" "}
+              {currentPlayerName ? currentPlayerName : "-"}
+            </div>
+            <div className="my-1 mx-5 order-2 sm:order-3">
+              <strong className="me-2 text-purple-700">Player 2:</strong>{" "}
+              {game.player2Name ? game.player2Name : "-"}
+            </div>
+          </div>
+          <button
+            className="flex-shrink-0 my-3 sm:my-0 bg-red-500 hover:bg-red-700 border-red-500 hover:border-red-700 text-md border-4 text-white py-1 sm:py-2 px-6 rounded-full focus:outline-none	"
+            type="button"
+            onClick={handleLeave}
+          >
+            Leave game
+          </button>
         </div>
         <div className="w-full mt-5 py-5">
           <GameBoard board={game.board} handleMove={handleMove} />

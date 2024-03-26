@@ -9,7 +9,7 @@ const GameCard: React.FC<{
   handleJoinGame: (id: string) => void;
 }> = ({ title, player, gameId, handleJoinGame }) => {
   return (
-    <div className="relative my-7 border shadow-md border-gray-200 bg-white rounded-full w-full p-3 flex sm:flex-row flex-col align-center justify-between leading-normal">
+    <div className="relative my-7 border shadow-md border-gray-200 bg-white rounded-full w-full p-3 flex sm:flex-row flex-col align-center justify-center sm:justify-between leading-normal">
       <div className="absolute bottom-0 top-0 flex justify-center items-center left-5 sm:left-0">
         <FontAwesomeIcon
           icon={faGamepad}
@@ -18,7 +18,7 @@ const GameCard: React.FC<{
       </div>
       <div style={{ marginLeft: "100px" }}>
         <div className="mb-1 ms-1 sm:ms-0">
-          <div className="text-purple-800 font-semibold text-lg text-start">
+          <div className="text-purple-800 font-semibold text-lg text-start pe-5">
             {title} - {gameId}
           </div>
         </div>
@@ -28,7 +28,7 @@ const GameCard: React.FC<{
         </div>
       </div>
       <button
-        className="flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-1 px-6 rounded-full focus:outline-none	"
+        className="max-w-28 mt-3 sm:mt-0 mx-auto sm:mx-0 flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-2 px-6 rounded-full focus:outline-none"
         type="button"
         onClick={() => handleJoinGame(gameId)}
       >
