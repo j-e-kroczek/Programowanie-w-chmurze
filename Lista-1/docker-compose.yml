@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   nestjs-app:
     build:
@@ -6,14 +6,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      NODE_ENV: production
 
-  nextjs-app:
+  react-app:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
-    environment:
-      NODE_ENV: production
+      - 8080:8080

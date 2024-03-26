@@ -2,11 +2,12 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 
-const GameCard: React.FC<{ title: string; player: string; gameId: string }> = ({
-  title,
-  player,
-  gameId,
-}) => {
+const GameCard: React.FC<{
+  title: string;
+  player: string;
+  gameId: string;
+  handleJoinGame: (id: string) => void;
+}> = ({ title, player, gameId, handleJoinGame }) => {
   return (
     <div className="relative my-7 border shadow-md border-gray-200 bg-white rounded-full w-full p-3 flex sm:flex-row flex-col align-center justify-between leading-normal">
       <div className="absolute bottom-0 top-0 flex justify-center items-center left-5 sm:left-0">
@@ -26,17 +27,13 @@ const GameCard: React.FC<{ title: string; player: string; gameId: string }> = ({
           <p className="text-purple-500">{player}</p>
         </div>
       </div>
-      <a
-        href={"/game/" + gameId}
-        className="flex items-center justify-end me-6 sm:me-0"
+      <button
+        className="flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-1 px-6 rounded-full focus:outline-none	"
+        type="button"
+        onClick={() => handleJoinGame(gameId)}
       >
-        <button
-          className="flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-2 px-6 rounded-full focus:outline-none	"
-          type="button"
-        >
-          Join
-        </button>
-      </a>
+        Join
+      </button>
     </div>
   );
 };
