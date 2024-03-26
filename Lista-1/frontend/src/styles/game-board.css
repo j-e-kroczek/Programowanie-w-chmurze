@@ -27,12 +27,18 @@
   text-align: center;
   vertical-align: middle;
   border-color: #805ad5;
+  cursor: pointer;
 }
 
-.cross {
-}
-
+.cross,
 .circle {
+  background-color: #e9d8fd;
+  cursor: default;
+}
+
+.cross:hover,
+.circle:hover {
+  background-color: #e9d8fd !important;
 }
 
 .cross::before,

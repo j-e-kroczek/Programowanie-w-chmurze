@@ -26,7 +26,10 @@ const GameCard: React.FC<{ title: string; player: string; gameId: string }> = ({
           <p className="text-purple-500">{player}</p>
         </div>
       </div>
-      <a href="/game" className="flex items-center justify-end me-6 sm:me-0">
+      <a
+        href={"/game/" + gameId}
+        className="flex items-center justify-end me-6 sm:me-0"
+      >
         <button
           className="flex-shrink-0 bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 text-md border-4 text-white py-1 sm:py-2 px-6 rounded-full focus:outline-none	"
           type="button"

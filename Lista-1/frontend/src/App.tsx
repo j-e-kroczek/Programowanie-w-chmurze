@@ -9,7 +9,7 @@ export const App: React.FC = () => (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/games-list" element={<GamesList />} />
-      <Route path="/game" element={<Game />} />
+      <Route path="/game/:id" element={<Game />} />
     </Routes>
   </BrowserRouter>
 );
