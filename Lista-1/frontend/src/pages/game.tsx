@@ -10,8 +10,10 @@ import GameInfo from "../components/game-info";
 export const Game: React.FC<{}> = () => {
   const { id } = useParams();
   console.log(id);
+  const socketURL = import.meta.env.VITE_SOCKET_URL;
+  const apiURL = import.meta.env.VITE_API_URL;
 
-  const socket = io("http://localhost:3000", {
+  const socket = io(socketURL, {
     reconnectionDelayMax: 10000,
   });
 
@@ -23,13 +25,13 @@ export const Game: React.FC<{}> = () => {
 
   const [playerId, setPlayerId] = useState<string | null>(null);
 
-  const gameListApi = "http://localhost:3000/api/game/" + id;
+  const gameListApi = apiURL + "/game/" + id;
 
-  const makeMoveApi = "http://localhost:3000/api/game/" + id + "/move";
+  const makeMoveApi = apiURL + "/game/" + id + "/move";
 
-  const restartGameApi = "http://localhost:3000/api/game/" + id + "/restart";
+  const restartGameApi = apiURL + "/game/" + id + "/restart";
 
-  const quitGameApi = "http://localhost:3000/api/game/" + id + "/quit";
+  const quitGameApi = apiURL + "/game/" + id + "/quit";
 
   const [currentPlayerName, setCurrentPlayerName] = useState<
     string | undefined

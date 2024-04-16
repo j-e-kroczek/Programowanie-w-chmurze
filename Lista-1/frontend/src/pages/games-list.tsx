@@ -8,13 +8,15 @@ import { toast } from "react-hot-toast";
 export const GamesList: React.FC = () => {
   const [gameList, setGameList] = useState<Array<IGame>>([]);
 
-  const gameListApi = "http://localhost:3000/api/game";
+  const apiURL = import.meta.env.VITE_API_URL;
+
+  const gameListApi = apiURL + "/game";
 
   const [isCreatingGame, setIsCreatingGame] = useState(false);
 
-  const createGameApi = "http://localhost:3000/api/game/create";
+  const createGameApi = apiURL + "/game/create";
 
-  const joinGameApi = "http://localhost:3000/api/game/join/";
+  const joinGameApi = apiURL + "/game/join/";
 
   const [nickname, setNickname] = useState("");
 
@@ -27,6 +29,7 @@ export const GamesList: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log(apiURL);
     axios.get(gameListApi).then((response) => {
       setGameList(response.data);
     });

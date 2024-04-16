@@ -3,3 +3,5 @@
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
+Lista-2/key_ssh.pem
+Lista-2/.terraform.tfstate.lock.info
