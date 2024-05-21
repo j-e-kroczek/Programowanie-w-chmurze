@@ -1,5 +1,5 @@
 terraform {
-  required_providers {
+  required_providers {  // Określenie dostawcy, w tym przypadku AWS
     aws = {
       source  = "hashicorp/aws"
       version = "~> 4.16"
@@ -8,11 +8,11 @@ terraform {
   required_version = ">= 1.2.0"
 }
 
-provider "aws" {
+provider "aws" {  // Określenie regionu, w którym mają być tworzone zasoby
   region = "us-east-1"
 }
 
-resource "tls_private_key" "rsa_4096" {
+resource "tls_private_key" "rsa_4096" { // Generowanie klucza prywatnego i publicznego
   algorithm = "RSA"
   rsa_bits  = 4096
 }
@@ -32,7 +32,7 @@ resource "local_file" "private_ssh_key" {
   filename = var.ssh_key_name
 }
 
-resource "aws_instance" "tictactoe_server" {
+resource "aws_instance" "tictactoe_server" {  // Tworzenie instancji EC2 z zadanymi parametrami
   ami                         = "ami-0c101f26f147fa7fd"
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.server_subnet.id
@@ -44,23 +44,23 @@ resource "aws_instance" "tictactoe_server" {
     Name = "TTTServer"
   }
 
-  connection {
+  connection {  // Połączenie z instancją za pomocą klucza prywatnego
     type        = "ssh"
     user        = "ec2-user"
     private_key = file(var.ssh_key_name)
     host        = self.public_ip
   }
 
-  provisioner "remote-exec" {
+  provisioner "remote-exec" { // Wykonanie poleceń na instancji
     inline = [
-      "sudo yum update -y",
-      "sudo yum install -y docker",
-      "sudo usermod -aG docker $${USER}",
-      "sudo systemctl start docker",
-      "sudo systemctl enable docker",
+      "sudo yum update -y", 
+      "sudo yum install -y docker", 
+      "sudo usermod -aG docker $${USER}", 
+      "sudo systemctl start docker", 
+      "sudo systemctl enable docker", 
       "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose",
-      "sudo chmod +x /usr/local/bin/docker-compose",
-      "sudo yum install -y git",
+      "sudo chmod +x /usr/local/bin/docker-compose", 
+      "sudo yum install -y git", 
       "sudo git clone https://github.com/j-e-kroczek/Programowanie-w-chmurze.git",
       "echo 'VITE_API_URL=\"http://${self.public_ip}:3000/api\"' | sudo tee Programowanie-w-chmurze/Lista-1/frontend/.env.local",
       "echo 'VITE_SOCKET_URL=\"http://${self.public_ip}:3000\"' | sudo tee -a Programowanie-w-chmurze/Lista-1/frontend/.env.local",
@@ -70,7 +70,7 @@ resource "aws_instance" "tictactoe_server" {
   }
 }
 
-resource "aws_vpc" "server_vpc" {
+resource "aws_vpc" "server_vpc" { // Tworzenie VPC
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
   tags = {
@@ -78,7 +78,7 @@ resource "aws_vpc" "server_vpc" {
   }
 }
 
-resource "aws_subnet" "server_subnet" {
+resource "aws_subnet" "server_subnet" { // Tworzenie subneta
   vpc_id     = aws_vpc.server_vpc.id
   cidr_block = "10.0.1.0/24"
   tags = {
@@ -86,13 +86,13 @@ resource "aws_subnet" "server_subnet" {
   }
 }
 
-resource "aws_internet_gateway" "server_gateway" {
+resource "aws_internet_gateway" "server_gateway" { // Tworzenie bramy internetowej
   vpc_id = aws_vpc.server_vpc.id
   tags = {
     Name = "Server gateway"
   }
 }
-resource "aws_route_table" "server_route_table" {
+resource "aws_route_table" "server_route_table" { // Tworzenie tablicy routingu
   vpc_id = aws_vpc.server_vpc.id
   route {
     cidr_block = "0.0.0.0/0"
@@ -100,18 +100,18 @@ resource "aws_route_table" "server_route_table" {
   }
 }
 
-resource "aws_route_table_association" "server_subnet_association" {
+resource "aws_route_table_association" "server_subnet_association" { // Przypisanie tablicy routingu do subnety
   subnet_id      = aws_subnet.server_subnet.id
   route_table_id = aws_route_table.server_route_table.id
 }
 
-resource "aws_security_group" "server_security_group" {
+resource "aws_security_group" "server_security_group" { // Tworzenie grupy zabezpieczeń
   name        = "Server security group"
   description = "Srver security group"
   vpc_id      = aws_vpc.server_vpc.id
 
 
-  ingress {
+  ingress { // Otwarcie portów 22, 8080, 3000
     description      = "SSH"
     from_port        = 22
     to_port          = 22
@@ -120,7 +120,7 @@ resource "aws_security_group" "server_security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  ingress {
+  ingress { 
     description      = "frontend"
     from_port        = 8080
     to_port          = 8080
@@ -129,7 +129,7 @@ resource "aws_security_group" "server_security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  ingress {
+  ingress { 
     description      = "backend"
     from_port        = 3000
     to_port          = 3000
@@ -138,7 +138,7 @@ resource "aws_security_group" "server_security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  egress {
+  egress { // Otwarcie wszystkich portów wychodzących
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
@@ -147,6 +147,6 @@ resource "aws_security_group" "server_security_group" {
   }
 }
 
-output "instance_public_ip" {
+output "instance_public_ip" { // Wyświetlenie publicznego IP instancji
   value = aws_instance.tictactoe_server.public_ip
 }
