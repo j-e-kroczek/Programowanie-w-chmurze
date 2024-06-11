@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <title>{% block title %} {% endblock %}</title>
+    {% load bootstrap_icons %} {% load bootstrap5 %} {% bootstrap_css %}
+    {%bootstrap_javascript %}
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand text-white" href="#">Filestorage</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link text-white" aria-current="page" href="{% url "logout" %}"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    {% for message in messages %}
+    <div class="container-fluid p-0">
+      <div
+        class="alert {{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="container">
+      <h1 class="my-4 fw-normal">User Files</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col" class="fw-normal">#</th>
+            <th scope="col" class="fw-normal">File Name</th>
+            <th scope="col" class="fw-normal">Upload Date</th>
+            <th scope="col" class="fw-normal">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for file in user_files %}
+          <tr>
+            <th scope="row" class="fw-light align-middle">
+              {{ forloop.counter }}
+            </th>
+            <td style="width: 300px" class="fw-light align-middle">
+              {{ file.file_name }}
+            </td>
+            <td style="width: 300px" class="fw-light align-middle">
+              {{ file.uploaded_at }}
+            </td>
+            <td class="d-flex align-items-center">
+              <a
+                href="{% url 'downloadFile' file.s3_file_id %}"
+                target="_blank"
+                class="btn text-secondary p-0"
+                >{% bs_icon 'download' %}</a
+              >
+              <a
+                href="{% url 'deleteFile' file.s3_file_id %}"
+                class="btn text-secondary p-0 mx-3"
+                >{% bs_icon 'trash' %}</a
+              >
+              <form
+                action="{% url 'editFile' file.s3_file_id %}"
+                method="post"
+                style="width: 450px"
+                class="d-flex my-auto ms-auto"
+              >
+                {% csrf_token %}
+                <input
+                  type="text"
+                  class="form-control px-2 me-2"
+                  style="width: 300px"
+                  placeholder="New file name"
+                  name="newFileName"
+                />
+                <button
+                  type="submit"
+                  style="width: 150px"
+                  class="btn btn-warning text-secondary p-0"
+                >
+                  Change name {% bs_icon 'pencil' %}
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h1 class="mt-5 mb-4 fw-normal">Add new file</h1>
+      <form
+        action=""
+        class="d-flex"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="mb-3 me-3" style="width: 45%">
+          <label for="fileNameInput" class="form-label">File name</label>
+          <input
+            required
+            type="text"
+            class="form-control"
+            id="fileNameInput"
+            aria-describedby="fileNameHelp"
+            name="fileName"
+          />
+        </div>
+        <div class="mb-3 me-3" style="width: 45%">
+          <label for="fileInput" class="form-label">File</label>
+          <input class="form-control" type="file" id="fileInput" required name="file" />
+        </div>
+        <button
+          type="submit"
+          style="width: 10%"
+          class="btn btn-primary mt-auto mb-3"
+        >
+          Submit
+        </button>
+      </form>
+
+      {% block content %} {% endblock %}
+    </div>
+  </body>
+</html>
